@@ -17,9 +17,13 @@ TOTNUMBER = 5
 # 必须修改，例子: pathToLog = r'/home/user/log.txt'
 pathToLog = PATH_TO_YOUR_LOG
 
-# 修改为你的 Cookies 路径，用于记录你的登录信息
-# 必须修改，例子: pathToCookies = r'/home/user/cookies.txt'
-pathToCookies = PATH_TO_YOUR_COOKIES
+# 你的账号
+# 必须修改，例子： username = r'123456'
+username = YOUR_USERNAME
+
+# 你的密码
+# 必须修改，例子： password = r'abcd123'
+password = YOUR_PASSWORD
 
 # ------------ 以下内容不应被修改 ------------ #
 
@@ -47,21 +51,17 @@ class GoToSleep:
         self.driver.get(url)
         self.driver.implicitly_wait(30)
 
-    def login(self) -> None:  # 利用 Cookies 登录
+    def login(self) -> None:  # 利用账号密码登录
         self.changePage(url0)
-        self.driver.delete_all_cookies()
-        with open(pathToCookies, 'r') as f:
-            cookies_list = json.load(f)
-            for cookie in cookies_list:
-                # expiry 字段出错，改为 int 型后不报错
-                if isinstance(cookie.get('expiry'), float):
-                    cookie['expiry'] = int(cookie['expiry'])
-                self.driver.add_cookie(cookie)
-        self.driver.refresh()
+        u1 = self.driver.find_element_by_xpath(r'//*[@id="lUsername"]')
+        u1.send_keys(username)
+        u2 = self.driver.find_element_by_xpath(r'//*[@id="lPassword"]')
+        u2.send_keys(password)
         manualWait(3.5)
+        self.driver.find_element_by_xpath(r'//*[@id="f_sign_up"]').submit()
 
     def changeToCourse(self) -> None:  # 切换至问答页面的“最新”选项卡
-        self.changePage(url1)
+        self.driver.find_element_by_xpath(r'//*[@id="headerMain"]/ul/li[5]/a').click()
         manualWait(5)
         qa = self.driver.find_element_by_xpath(r'//*[@id="sharingClassed"]/div[2]/ul/div/dl/dt/div[2]/ul/li[3]/a')
         url_tmp = qa.get_attribute('href')
